@@ -1,0 +1,16 @@
+language: python
+python:
+  - "3.6"
+services:
+  - postgresql
+before_script:
+  - psql -c 'create database testdb;' -U postgres
+install: pip install -r requirements.txt
+script:
+  - coverage run  manage.py test
+
+after_success:
+  - coveralls
+
+notifications:
+  - email: false
