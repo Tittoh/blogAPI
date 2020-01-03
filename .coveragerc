@@ -1,0 +1,18 @@
+[run]
+omit =
+    authors/*__init__.py
+    */tests/*
+    */migrations/*
+     authors/settings.py
+     */wsgi.py
+
+source =
+      authors
+
+[report]
+omit =
+    authors/*__init__.py
+    */tests/*
+    */migrations/*
+     authors/settings.py
+     */wsgi.py 
