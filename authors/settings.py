@@ -38,7 +38,7 @@ JWT_SECRET_KEY = env('JWT_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['10.10.156.84', '10.10.190.236', 'localhost']
+ALLOWED_HOSTS = ['10.10.156.84', '10.10.190.236', 'localhost', '127.0.0.1', '.herokuapp.com']
 
 # Application definition
 
@@ -137,7 +137,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 CORS_ORIGIN_WHITELIST = (
     'https://localhost:8080',
-    'https://127.0.0.1:9000',
+    'https://127.0.0.1:8000',
     'https://0.0.0.0:4000',
     'https://localhost:4000',
     'https://localhost:3000',

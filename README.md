@@ -3,6 +3,7 @@ Blog API
 [![Build Status](https://travis-ci.org/Tittoh/blogAPI.svg?branch=develop)](https://travis-ci.org/Tittoh/blogAPI) [![Coverage Status](https://coveralls.io/repos/github/Tittoh/blogAPI/badge.svg?branch=develop)](https://coveralls.io/github/Tittoh/blogAPI?branch=develop)
 =======
 
+API link: https://tittohtech-blogapi.herokuapp.com/
 
 # API Spec
 The JSON object should be structured as follows:
