@@ -30,8 +30,7 @@ class RegisterViewTest(APITestCase):
         response.render()
         user = json.loads(response.content)
         # Test that response is a subset of TEST_USER - contains users
-        self.assertTrue(set(user['user'].items()).issubset(
-            set(TEST_USER['user'].items())))
+        self.assertIsNotNone(user['user'].get('token', None), msg="User Should have a token")
 
     def test_email_required(self):
         """ Test that email is required on register. """
