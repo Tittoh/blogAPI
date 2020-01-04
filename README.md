@@ -3,7 +3,45 @@ Blog API
 [![Build Status](https://travis-ci.org/Tittoh/blogAPI.svg?branch=develop)](https://travis-ci.org/Tittoh/blogAPI) [![Coverage Status](https://coveralls.io/repos/github/Tittoh/blogAPI/badge.svg?branch=develop)](https://coveralls.io/github/Tittoh/blogAPI?branch=develop)
 =======
 
+
+# API Spec
+The JSON object should be structured as follows:
 ### Users (for authentication)
+
+#### Login input
+
+```source-json
+{
+  "user": {
+    "email": "jake@jake.jake",
+    "password": "jake4444"
+  }
+}
+```
+
+#### Login errors
+
+```source-json
+{
+  "errors": {
+    "email": [
+      "This field may not be blank."
+    ],
+    "password": [
+      "This field may not be blank."
+    ]
+  }
+}
+
+{
+  "errors": {
+    "error": [
+      "A user with this email and password was not found."
+    ]
+  }
+}
+```
+#### Login success
 
 ```source-json
 {
@@ -16,6 +54,7 @@ Blog API
   }
 }
 ```
+
 ### Profile
 ```source-json
 {
