@@ -38,7 +38,7 @@ JWT_SECRET_KEY = env('JWT_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['10.10.156.84', '10.10.190.236', 'localhost']
 
 # Application definition
 
@@ -136,8 +136,12 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 CORS_ORIGIN_WHITELIST = (
-    "http://localhost:8080",
-    "http://127.0.0.1:9000"
+    'https://localhost:8080',
+    'https://127.0.0.1:9000',
+    'https://0.0.0.0:4000',
+    'https://localhost:4000',
+    'https://localhost:3000',
+    'https://10.10.156.84:9000'
 )
 
 # Tell Django about the custom `User` model we created. The string
