@@ -1,7 +1,8 @@
+from django.conf.urls import url
 from django.urls import path
 
 from .views import (
-    LoginAPIView, RegistrationAPIView, UserRetrieveUpdateAPIView, VerifyAccount
+    LoginAPIView, RegistrationAPIView, UserRetrieveUpdateAPIView, VerifyAccount, SocialAuthView
 )
 
 app_name = "authentication"
@@ -12,4 +13,5 @@ urlpatterns = [
     path('users/login/', LoginAPIView.as_view(), name="login"),
     path('users/verify/<uidb64>/<token>/',
          VerifyAccount.as_view(), name="verify"),
+    path("oauth/", SocialAuthView.as_view(), name="oauth"),
 ]

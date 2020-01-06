@@ -4,6 +4,7 @@ certifi==2019.11.28
 chardet==3.0.4
 coverage==4.5.4
 coveralls==1.9.2
+defusedxml==0.6.0
 Django==3.0.1
 django-cors-headers==3.2.0
 django-environ==0.4.5
@@ -15,14 +16,19 @@ idna==2.8
 isort==4.3.21
 lazy-object-proxy==1.4.3
 mccabe==0.6.1
+oauthlib==3.1.0
 psycopg2-binary==2.8.4
 PyJWT==1.7.1
 pylint==2.4.4
 python-http-client==3.2.1
+python3-openid==3.1.0
 pytz==2019.3
 requests==2.22.0
+requests-oauthlib==1.3.0
 sendgrid==6.1.0
 six==1.13.0
+social-auth-app-django==3.1.0
+social-auth-core==3.2.0
 sqlparse==0.3.0
 urllib3==1.25.7
 wrapt==1.11.2

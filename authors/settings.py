@@ -45,14 +45,21 @@ ALLOWED_HOSTS = ['10.10.156.84', '10.10.190.236', 'localhost', '127.0.0.1', '.he
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
+    'django.contrib.sites',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+
     'corsheaders',
     'django_extensions',
     'rest_framework',
+    'social_django',
 
     'authors.apps.authentication',
     'authors.apps.core',
@@ -68,6 +75,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',
 ]
 
 ROOT_URLCONF = 'authors.urls'
@@ -83,6 +91,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -170,3 +180,43 @@ EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 # JWT_EXPIRATION_DELTA set to default 1 day
 JWT_EXPIRATION_DELTA = datetime.timedelta(
     seconds=env("JWT_EXPIRATION_SECONDS", default=86400))
+
+# OAUTH
+AUTHENTICATION_BACKENDS = (
+    #Google OAuth2
+    'social_core.backends.google.GoogleOAuth2',
+    # Facebook OAuth2
+    'social_core.backends.facebook.FacebookAppOAuth2',
+    'social_core.backends.facebook.FacebookOAuth2',
+    # Django
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+#Google configuration
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env('GOOGLE_KEY')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env('GOOGLE_SECRET')
+#Scope
+SOCIAL_AUTH_GOOGLE_OAUTH_SCOPE = ['email', 'username']
+
+# Facebook configuration
+SOCIAL_AUTH_FACEBOOK_KEY = env('FACEBOOK_KEY')
+SOCIAL_AUTH_FACEBOOK_SECRET = env('FACEBOOK_SECRET')
+SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']
+SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
+    'fields': 'id, name, email',
+}
+FACEBOOK_EXTENDED_PERMISSIONS = ['email']
+
+
+SOCIAL_AUTH_PIPELINE = (
+    'social_core.pipeline.social_auth.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.auth_allowed',
+    'social_core.pipeline.social_auth.social_user',
+    'social_core.pipeline.user.get_username',
+    'social_core.pipeline.social_auth.associate_by_email',
+    'social_core.pipeline.user.create_user',
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'social_core.pipeline.user.user_details',
+)
