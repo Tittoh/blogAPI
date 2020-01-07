@@ -1,0 +1,10 @@
+DEBUG=<true of false>
+DATABASE_URL=postgresql://<username>:<password>@<host>:<port>/<dbname>
+SECRET_KEY=<7pgozr2jn7zs_o%i8id6rddie!*0f0qy3$8231i^4*@u3>
+JWT_SECRET_KEY=<o%i8id6rddie!*0f0qy3$8231i^4*@u3o%i8id6rddie!>
+JWT_EXPIRATION_SECONDS=<36000>
+EMAIL_HOST_PASSWORD=<api key>
+GOOGLE_KEY=<Client ID>
+GOOGLE_SECRET=<Client secret>
+FACEBOOK_KEY=<app id>
+FACEBOOK_SECRET=<app secret>
