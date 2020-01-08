@@ -1,7 +1,8 @@
 from django.contrib.auth import authenticate
 
-from rest_framework import serializers
+from django.contrib.auth.tokens import default_token_generator
 
+from rest_framework import serializers
 from authors.apps.profiles.serializers import ProfileSerializer
 from .models import User
 
@@ -94,6 +95,61 @@ class LoginSerializer(serializers.Serializer):
 
         }
 
+class EmailSerializer(serializers.Serializer):
+    # Ensures that the email is not more than 255 characters long
+    email = serializers.EmailField(max_length=255)
+    token = serializers.CharField(max_length=225, required=False)
+    username = serializers.CharField(
+        max_length=225, required=False, read_only=True)
+    # Validate that the email
+
+    def validate(self, data):
+        user = User.objects.filter(email=data.get('email', None)).first()
+
+        # Check that the user exists
+        if user is None:
+            raise serializers.ValidationError(
+                "User with this email doesn't exist"
+            )
+        token = default_token_generator.make_token(user)
+        return {
+            "email": data.get("email"),
+            "token": token,
+            'username': user.username,
+        }
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+
+    # Ensures that the email is not more than 128 characters long
+    # Ensures that the user cannot read the password
+    token = serializers.CharField(max_length=225)
+    email = serializers.CharField(max_length=225)
+    new_password = serializers.CharField(
+        max_length=128,
+        min_length=8,
+        write_only=True
+    )
+
+    def create(self, validated_data):
+        user = User.objects.get(email=validated_data.get('email', None))
+        return user
+
+    def validate(self, data):
+        user = User.objects.filter(email=data.get('email', None)).first()
+        is_valid_token = default_token_generator.check_token(
+            user, data.get('token'))
+
+        if is_valid_token is not True:
+            raise serializers.ValidationError(
+                "Invalid token. Please generate another reset password email"
+            )
+
+        user.set_password(data.get('new_password', None))
+        user.save()
+
+        return data
+
 
 class UserSerializer(serializers.ModelSerializer):
     """Handles serialization and deserialization of User objects."""
@@ -148,9 +204,17 @@ class UserSerializer(serializers.ModelSerializer):
             setattr(instance, key, value)
 
         if password is not None:
+            print("password only")
             # `.set_password()` is the method mentioned above. It handles all
             # of the security stuff that we shouldn't be concerned with.
             instance.set_password(password)
+
+        else:
+            print("others")
+            for (key, value) in validated_data.items():
+                # For the keys remaining in `validated_data`, we will set them on
+                # the current `User` instance one at a time.
+                setattr(instance, key, value)
 
         # Finally, after everything has been updated, we must explicitly save
         # the model. It's worth pointing out that `.set_password()` does not

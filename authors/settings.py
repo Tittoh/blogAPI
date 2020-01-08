@@ -181,6 +181,8 @@ EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 JWT_EXPIRATION_DELTA = datetime.timedelta(
     seconds=env("JWT_EXPIRATION_SECONDS", default=86400))
 
+VERIFCATION_URL = "http://localhost:8000/verify/"
+
 # OAUTH
 AUTHENTICATION_BACKENDS = (
     #Google OAuth2

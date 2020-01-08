@@ -20,3 +20,16 @@ class TestUrls(TestCase):
         """ Tests if url for updating user exists. """
         url = reverse("authentication:user")
         self.assertEqual(resolve(url).view_name, "authentication:user")
+    def test_forgot_password_url(self):
+        """ Tests if url for sending reset password email exists. """
+        url = reverse("authentication:forgot_password")
+        self.assertEqual(resolve(url).view_name,
+                         "authentication:forgot_password")
+
+    def test_reset_password_url(self):
+        """ Tests if url for sending reset password email exists. """
+        url = reverse("authentication:reset_password")
+        self.assertEqual(resolve(url).view_name,
+                         "authentication:reset_password")
+        url = reverse("authentication:user")
+        self.assertEqual(resolve(url).view_name, "authentication:user")
