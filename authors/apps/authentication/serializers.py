@@ -2,6 +2,7 @@ from django.contrib.auth import authenticate
 
 from rest_framework import serializers
 
+from authors.apps.profiles.serializers import ProfileSerializer
 from .models import User
 
 
@@ -107,14 +108,18 @@ class UserSerializer(serializers.ModelSerializer):
         write_only=True
     )
 
-    token = serializers.CharField(
-        max_length=128,
-        read_only=True
-    )
+    profile = ProfileSerializer(write_only=True)
+
+    bio = serializers.CharField(source='profile.bio', read_only=True)
+    image = image = serializers.CharField(
+        source='profile.image', read_only=True)
 
     class Meta:
         model = User
-        fields = ('email', 'username', 'password', 'token')
+        fields = (
+            'email', 'username', 'password', 'profile', 'bio',
+            'image',
+        )
 
         # The `read_only_fields` option is an alternative for explicitly
         # specifying the field with `read_only=True` like we did for password
@@ -135,6 +140,8 @@ class UserSerializer(serializers.ModelSerializer):
         # `validated_data` dictionary before iterating over it.
         password = validated_data.pop('password', None)
 
+        profile_data = validated_data.pop('profile', {})
+
         for (key, value) in validated_data.items():
             # For the keys remaining in `validated_data`, we will set them on
             # the current `User` instance one at a time.
@@ -149,6 +156,11 @@ class UserSerializer(serializers.ModelSerializer):
         # the model. It's worth pointing out that `.set_password()` does not
         # save the model.
         instance.save()
+
+        for (key, value) in profile_data.items():
+            setattr(instance.profile, key, value)
+
+        instance.profile.save()
 
         return instance
 
