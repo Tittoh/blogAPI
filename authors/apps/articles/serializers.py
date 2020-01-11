@@ -6,7 +6,8 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
 from authors.apps.profiles.serializers import ProfileSerializer
-from .models import Article, Rate, Comment
+from .models import Article, Rate, Comment, Tag
+from .utils import TagField
 
 class RecursiveSerializer(serializers.Serializer):
    def to_representation(self, value):
@@ -34,13 +35,14 @@ class ArticleSerializer(serializers.ModelSerializer):
     likes_count = serializers.SerializerMethodField()
     dislikes_count = serializers.SerializerMethodField()
     average_rating = serializers.FloatField(required=False, read_only=True)
+    tagList = TagField(many=True, required=False, source='tags')
 
     class Meta:
         model = Article
         fields = ['title', 'slug', 'body',
             'description', 'image_url', 'created_at', 'updated_at',
                   'author', 'likes', 'dislikes','average_rating',
-                  'likes_count', 'dislikes_count', 'favorited', 'favoriteCount',]
+                  'likes_count', 'dislikes_count', 'favorited', 'favoriteCount', 'tagList',]
     
     def get_favorite_count(self, instance):
         return instance.users_favorites.count()
@@ -57,7 +59,14 @@ class ArticleSerializer(serializers.ModelSerializer):
         return obj.dislikes.count()
 
     def create(self, validated_data):
-        return Article.objects.create(**validated_data)
+        tags = validated_data.pop('tags', [])
+
+        article = Article.objects.create(**validated_data)
+
+        for tag in tags:
+            article.tags.add(tag)
+
+        return article
 
     def validate(self, data):
         # The `validate` method is used to validate the title,
@@ -123,3 +132,14 @@ class RateSerializer(serializers.Serializer):
                 'Rate should be from 0 to 5.')
 
         return {"rate": rating}
+
+class TagSerializer(serializers.ModelSerializer):
+    """
+    Define the tag serializer
+    """
+    class Meta:
+        model = Tag
+        fields = ('tag',)
+
+    def to_representation(self, obj):
+        return obj.tag

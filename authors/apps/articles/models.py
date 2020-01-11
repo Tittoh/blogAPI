@@ -22,6 +22,7 @@ class Article(TimeModel):
     likes = models.ManyToManyField(User, related_name="likes", blank=True)
     dislikes = models.ManyToManyField(
         User, related_name="dislikes", blank=True)
+    tags = models.ManyToManyField('articles.Tag', related_name='articles')
 
     def __str__(self):
         return self.title
@@ -68,4 +69,13 @@ def add_one_to_counter(sender, instance, *args, **kwargs):
     """ create a signal to add counter value by one. """
 
     instance.counter = instance.counter + 1
-    
+
+class Tag(TimeModel):
+    """
+    Tags model
+    """
+    tag = models.CharField(max_length=255)
+    slug = models.SlugField(db_index=True, unique=True)
+
+    def __str__(self):
+        return '{}'.format(self.tag)
