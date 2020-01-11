@@ -8,3 +8,4 @@ GOOGLE_KEY=<Client ID>
 GOOGLE_SECRET=<Client secret>
 FACEBOOK_KEY=<app id>
 FACEBOOK_SECRET=<app secret>
+VERIFICATION_URL=http://localhost:8000/verify/

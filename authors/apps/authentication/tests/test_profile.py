@@ -7,7 +7,13 @@ from rest_framework.test import APIClient
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 
-from .utils import TEST_USER
+TEST_USER = {
+    "user": {
+        "email": "test@mail.com",
+        "password": "Pass123.",
+        "username": "testuser"
+    }
+}
 
 
 class TestUserProfile(APITestCase):
@@ -32,8 +38,12 @@ class TestUserProfile(APITestCase):
         """
         This displays the initial user profile after registration
         """
-        name = self.register_user(TEST_USER).get("user").get("username")
+        user_details = self.register_user(TEST_USER).get("user")
+        token = user_details['token']
+        name = user_details['username']
+
         url = reverse("profiles:view_profile", args=[name])
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer '+token)
         response = self.client.get(url)
         response.render()
         profile = json.loads(response.content)
@@ -48,6 +58,8 @@ class TestUserProfile(APITestCase):
         """
         wrong_name = "my_name"
         url = reverse("profiles:view_profile", args=[wrong_name])
+        token = self.register_user(TEST_USER).get("user").get("token")
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer '+token)
         response = self.client.get(url)
         response.render()
         profile = json.loads(response.content)
