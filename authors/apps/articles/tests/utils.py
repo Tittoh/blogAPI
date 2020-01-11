@@ -1,5 +1,7 @@
 """ utils provide data and methods used for testing. """
 from django.contrib.auth import get_user_model
+from authors.apps.authentication.models import User
+from authors.apps.articles.models import Article
 
 TEST_USER = {
     "user": {
@@ -8,6 +10,19 @@ TEST_USER = {
         "username": "testuser"
     }
 }
+
+def create_article():
+    """
+    Create a test article
+    """
+    user = User.objects.get()
+    article = Article.objects.create(
+                title="django",
+                description="django tests",
+                body="body", author=user.profile)
+    article.save()
+    return article
+
 
 def create_user(username="testuser", email="testuser@mail.com",
                 password="Pass123."):

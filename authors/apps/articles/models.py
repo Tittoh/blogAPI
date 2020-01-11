@@ -3,6 +3,8 @@ from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from authors.apps.core.utils import random_string_generator, generate_slug
 from authors.apps.core.models import TimeModel
+
+from authors.apps.authentication.models import User
 from authors.apps.profiles.models import Profile
 
 class Article(TimeModel):
@@ -17,6 +19,9 @@ class Article(TimeModel):
                     related_name='articles')
     # default image for the article.
     image_url = models.URLField(blank=True, null=True)
+    likes = models.ManyToManyField(User, related_name="likes", blank=True)
+    dislikes = models.ManyToManyField(
+        User, related_name="dislikes", blank=True)
 
     def __str__(self):
         return self.title
@@ -33,6 +38,22 @@ def add_slug_to_article_if_not_exists(sender, instance, *args, **kwargs):
     if article.title != instance.title:
         instance.slug = slug
         return
+
+class Comment(TimeModel):
+    """ Model to represent a Comment. """
+    body = models.TextField()
+
+    article = models.ForeignKey(
+        'articles.Article', related_name='comments', on_delete=models.CASCADE
+    )
+
+    author = models.ForeignKey(
+        'profiles.Profile', related_name='comments', on_delete=models.CASCADE
+    )
+
+    parent = models.ForeignKey(
+        'self', null=True, blank=False, on_delete=models.CASCADE, related_name='thread'
+    )
 
 class Rate(models.Model):
     """Ratings model."""

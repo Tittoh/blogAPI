@@ -13,6 +13,13 @@ from rest_framework.test import force_authenticate
 from rest_framework.test import APIRequestFactory
 from authors.apps.articles.models import Article
 
+user = {
+    "user": {
+        "username": "test",
+        "email": "info@test.co",
+        "password": "Test123."
+    }
+}
 
 class ArticleCRUDTestCase(APITestCase):
     """Test Cases to test ratings feature"""
@@ -50,13 +57,13 @@ class ArticleCRUDTestCase(APITestCase):
             }
         }
 
-    def login_user(self):
+    def login_user(self, user=user):
         """
         login user
         """
         response = self.client.post(
             reverse("authentication:login"),
-            self.user,
+            user,
             format='json')
         response.render()
         user = json.loads(response.content)
@@ -322,6 +329,86 @@ class ArticleCRUDTestCase(APITestCase):
                                )
         self.assertEquals(res.status_code, 200)
 
+    def test_user_cannot_update_404_article(self):
+        """
+        Tests that a user can update an article
+        """
+        user = self.create_a_user()
+        self.verify_user(user)
+        auth_user = self.login_user()
+        user = User.objects.get()
+        self.create_article()
+        res = self.client.put('/api/articles/dssdfd-sddsfs-sdsd/',
+                              self.article1,
+                              HTTP_AUTHORIZATION='Bearer ' +
+                              auth_user['user']['token'],
+                              format='json'
+                              )
+        self.assertEquals(res.status_code, 404)
+
+    def test_user_cannot_delete_404_article(self):
+        """
+        Tests that a user can update an article
+        """
+        user = self.create_a_user()
+        self.verify_user(user)
+        auth_user = self.login_user()
+        user = User.objects.get()
+        self.create_article()
+        res = self.client.delete('/api/articles/dssdfd-sddsfs-sdsd/',
+                                 HTTP_AUTHORIZATION='Bearer ' +
+                                 auth_user['user']['token'],
+                                 format='json'
+                                 )
+        self.assertEquals(res.status_code, 404)
+
+    def test_user_cannot_update_403_article(self):
+        """
+        Tests that a user can update an article
+        """
+        user = self.create_a_user()
+        self.verify_user(user)
+        self.login_user()
+        user = User.objects.get()
+        article = self.create_article()
+
+        user1 = self.create_a_user(username='Jacob', email='jake@jake.com',
+                                   password='Test123.')
+
+        self.verify_user(user1)
+        auth_user1 = self.login_user(user=self.user1)
+        user1 = User.objects.filter(email=user1.email).first()
+        res = self.client.put('/api/articles/'+article.slug+'/',
+                              self.article1,
+                              HTTP_AUTHORIZATION='Bearer ' +
+                              auth_user1['user']['token'],
+                              format='json'
+                              )
+        self.assertEquals(res.status_code, 403)
+
+    def test_user_cannot_delete_403_article(self):
+        """
+        Tests that a user can update an article
+        """
+        user = self.create_a_user()
+        self.verify_user(user)
+        self.login_user()
+        user = User.objects.get()
+        article = self.create_article()
+
+        user1 = self.create_a_user(username='Jacob', email='jake@jake.com',
+                                   password='Test123.')
+
+        self.verify_user(user1)
+        auth_user1 = self.login_user(user=self.user1)
+        user1 = User.objects.filter(email=user1.email).first()
+        res = self.client.delete('/api/articles/'+article.slug+'/',
+                                 HTTP_AUTHORIZATION='Bearer ' +
+                                 auth_user1['user']['token'],
+                                 format='json'
+                                 )
+        self.assertEquals(res.status_code, 403)
+
     def test_unauthorised_user_cannot_update_article(self):
         """
         Tests that unauthorised user cannot update an article
@@ -364,3 +451,34 @@ class ArticleCRUDTestCase(APITestCase):
                               format='json'
                               )
         self.assertEquals(res.status_code, 200)
+
+    def test_get_an_article(self):
+        """
+        Tests that a user can get articles
+        """
+        user = self.create_a_user()
+        self.verify_user(user)
+        auth_user = self.login_user()
+        user = User.objects.get()
+        article = self.create_article()
+        res = self.client.get(
+            '/api/articles/'+article.slug+'/', HTTP_AUTHORIZATION='Bearer ' + auth_user['user']['token'],
+            format='json'
+        )
+        self.assertEquals(res.status_code, 200)
+
+    def test_get_404_article(self):
+        """
+        Tests that a user can get articles
+        """
+        user = self.create_a_user()
+        self.verify_user(user)
+        auth_user = self.login_user()
+        user = User.objects.get()
+        self.create_article()
+        res = self.client.get(
+            '/api/articles/smdds-dcbdfa-2erafds/',
+            HTTP_AUTHORIZATION='Bearer ' + auth_user['user']['token'],
+            format='json'
+        )
+        self.assertEquals(res.status_code, 404)
