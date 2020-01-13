@@ -35,26 +35,6 @@ class TestFavoriteArticle(APITestCase):
         user = json.loads(response.content)
         return user
 
-    def test_user_get_favorite_non_existent_article(self):
-        """
-        Check if user can favorite an article with a non-existent slug.
-        """
-        user_details = self.register_user(TEST_USER).get("user")
-        token = user_details['token']
-        name = 'wrong slug :-('
-
-        url = reverse("articles:favorite", args=[name])
-
-        self.client.credentials(HTTP_AUTHORIZATION='Bearer '+token)
-
-        response = self.client.get(url)
-        response.render()
-        favorite = json.loads(response.content)
-        details = favorite["favorite"]["detail"]
-
-        self.assertEquals(details, "An article with this slug doesn't exist")
-        self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
-
     def test_user_favorite_non_existent_article(self):
         """
         Check if user can favorite an article with a non-existent slug.
@@ -95,6 +75,26 @@ class TestFavoriteArticle(APITestCase):
 
         self.assertEquals(count, 1)
         self.assertEquals(is_favorited, True)
+    
+    def test_user_unfavorite_non_existent_article(self):
+        """
+        Check if user can favorite an article with a non-existent slug.
+        """
+        user_details = self.register_user(TEST_USER).get("user")
+        token = user_details['token']
+        name = 'wrong slug :-('
+
+        url = reverse("articles:favorite", args=[name])
+
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer '+token)
+
+        response = self.client.delete(url)
+        response.render()
+        favorite = json.loads(response.content)
+        details = favorite["favorite"]["detail"]
+
+        self.assertEquals(details, "An article with this slug does not exist")
+        self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_user_unfavorite_article(self):
         article = CreateArticle().create_article()

@@ -5,7 +5,7 @@ from .views import RateAPIView, ArticleAPIView
 from .views import (
     LikesAPIView, DislikesAPIView, RateAPIView,
     ArticleAPIView, CommentsListCreateAPIView, CommentsCreateDestroyAPIView,
-    FavoriteAPIView, TagAPIView
+    FavoriteAPIView, TagAPIView, FilterSearchAPIView
 )
 
 app_name = "articles"
@@ -24,5 +24,6 @@ urlpatterns = [
     path('articles/<slug>/rate/', RateAPIView.as_view(), name="rate"),
     path('articles/<slug>/favorite/',
          FavoriteAPIView.as_view(), name="favorite"),
-    path('tags/', TagAPIView.as_view(), name='tags')
+    path('tags/', TagAPIView.as_view(), name='tags'),
+    path('articles', FilterSearchAPIView.as_view(), name="filter_search"),
 ]
