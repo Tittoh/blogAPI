@@ -32,16 +32,4 @@ class SocialViewTest(APITestCase):
             token,
             format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_authenticated_user_is_returned(self):
-        """ Test that user is returned """
-        token =  {
-                "access_token": access_token,
-                "provider": "facebook"
-            }
-        response = self.client.post(
-            reverse("authentication:oauth"),
-            token,
-            format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
     
