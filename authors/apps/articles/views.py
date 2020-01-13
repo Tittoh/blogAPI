@@ -8,7 +8,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status, mixins, viewsets
 from rest_framework.generics import RetrieveAPIView, CreateAPIView
-
+from rest_framework.pagination import PageNumberPagination
+from authors import settings
 from .models import Article, Rate, Comment, Tag
 from .serializers import ArticleSerializer, CommentSerializer, RateSerializer, TagSerializer
 from .renderers import ArticleJSONRenderer, CommentJSONRenderer, RateJSONRenderer, FavoriteJSONRenderer
@@ -136,19 +137,6 @@ class ArticleAPIView(mixins.CreateModelMixin,
         serializer.save(author=request.user.profile)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    def list(self, request):
-        """
-        Get all articles
-        """
-        serializer_context = {'request': request}
-        queryset = Article.objects.annotate(
-            average_rating=Avg("rate__ratings"))
-        serializer = self.serializer_class(
-            queryset, many=True,
-            context=serializer_context)
-
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def retrieve(self, request, slug):
         """

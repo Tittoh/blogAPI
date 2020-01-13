@@ -157,7 +157,7 @@ class CommentViews(APITestCase):
         url = reverse("articles:comments", kwargs={'article_slug':article.slug})
         response = self.client.get(url)
         content = json.loads(response.content)
-        self.assertEqual(len(content.get("comments")), 0)
+        self.assertEqual(len(content.get("comment").get("results")), 0)
 
         comment = Comment(body="I was cool", author=self.user.profile, article=article)
         comment.save()
