@@ -45,21 +45,28 @@ class RateTestCase(APITestCase):
                     "password":"Test123."
                     }
                 }
+        self.author = {
+                "user":{
+                    "username":"author",
+                    "email":"info@author.co",
+                    "password":"Test123."
+                    }
+                }
 
-    def login_user(self):
+    def login_user(self, user):
         """
         login user in order to access jwt token
         """
         response = self.client.post(
             reverse("authentication:login"),
-            self.user,
+            user,
             format='json')
         response.render()
         user = json.loads(response.content)
         return user
 
-    def create_a_user(self, username='test', email='info@test.co',
-            password='Test123.'):
+    def create_a_user(self, username, email,
+            password):
         """
         Create a test user
         """
@@ -71,7 +78,7 @@ class RateTestCase(APITestCase):
         """
         Create a test article
         """
-        user = User.objects.get()
+        user = User.objects.filter(username="author").first()
         article = Article.objects.create(
             title="django",
             description="django sucks",
@@ -91,11 +98,13 @@ class RateTestCase(APITestCase):
 
     def test_can_rate_an_articlej(self):
         """ Tests that a user can rate an article """
-        user = self.create_a_user() # create user
-        self.verify_user(user) # Verify created user
+        author = self.create_a_user("author", "info@author.co", "Test123.")
+        rater = self.create_a_user("test", "info@test.co", "Test123.") # create user
+        self.verify_user(author) # Verify created author
+        self.verify_user(rater) # Verify created rater
         # Login test user and return authorization token.
-        auth_user = self.login_user() 
-        user = User.objects.get()
+        auth_author = self.login_user(self.author) 
+        auth_user = self.login_user(self.user) 
         article = self.create_article() # create article
         res = self.client.post('/api/articles/'+article.slug+'/rate/',
                                     self.rate,
@@ -108,11 +117,13 @@ class RateTestCase(APITestCase):
 
     def test_can_not_rate_more_than_3_times(self):
         """ Should only rate for utmost 3 times."""
-        user = self.create_a_user() # create user
-        self.verify_user(user) # Verify created user
+        author = self.create_a_user("author", "info@author.co", "Test123.")
+        rater = self.create_a_user("test", "info@test.co", "Test123.") # create user
+        self.verify_user(author) # Verify created author
+        self.verify_user(rater) # Verify created rater
         # Login test user and return authorization token.
-        auth_user = self.login_user() 
-        user = User.objects.get()
+        auth_author = self.login_user(self.author) 
+        auth_user = self.login_user(self.user) 
         article = self.create_article() # create article
         # loop to rate article 3 times.
         x = 0 
@@ -131,17 +142,19 @@ class RateTestCase(APITestCase):
                                     auth_user["user"]["token"],
                                     format='json'
                                     )
-        self.assertEquals(res.data["errors"]["message"][0], "You are only allowed torate 3 times")
+        self.assertEquals(res.data["errors"]["message"][0], "You are only allowed to rate 3 times")
         self.assertEquals(res.status_code, 403)
 
     def test_rate_should_be_a_number(self):
         """ Should be an integer."""
 
-        user = self.create_a_user() # create user
-        self.verify_user(user) # Verify created user
+        author = self.create_a_user("author", "info@author.co", "Test123.")
+        rater = self.create_a_user("test", "info@test.co", "Test123.") # create user
+        self.verify_user(author) # Verify created author
+        self.verify_user(rater) # Verify created rater
         # Login test user and return authorization token.
-        auth_user = self.login_user() 
-        user = User.objects.get()
+        auth_author = self.login_user(self.author) 
+        auth_user = self.login_user(self.user) 
         article = self.create_article() # create article
         res = self.client.post('/api/articles/'+article.slug+'/rate/',
                                     self.rate_string,
@@ -156,13 +169,15 @@ class RateTestCase(APITestCase):
         self.assertEquals(res.status_code, 400)
 
     def test_rate_should_be_between_0_and_5(self):
-        """ Should be 0, 1, 2, 3, 4, 5."""
+        """ Should be 1, 2, 3, 4, 5."""
 
-        user = self.create_a_user() # create user
-        self.verify_user(user) # Verify created user
+        author = self.create_a_user("author", "info@author.co", "Test123.")
+        rater = self.create_a_user("test", "info@test.co", "Test123.") # create user
+        self.verify_user(author) # Verify created author
+        self.verify_user(rater) # Verify created rater
         # Login test user and return authorization token.
-        auth_user = self.login_user() 
-        user = User.objects.get()
+        auth_author = self.login_user(self.author) 
+        auth_user = self.login_user(self.user) 
         article = self.create_article() # create article
         res = self.client.post('/api/articles/'+article.slug+'/rate/',
                                     self.rate_range,
@@ -173,17 +188,19 @@ class RateTestCase(APITestCase):
         res.render()
         errors = json.loads(res.content).get('rate')
         error = errors['errors']['error'][0]
-        self.assertEquals(error, "Rate should be from 0 to 5.")
+        self.assertEquals(error, "Rate should be from 1 to 5.")
         self.assertEquals(res.status_code, 400)
 
     def test_rate_should_not_be_an_empty_string(self):
         """ Should not be an empty string."""
 
-        user = self.create_a_user() # create user
-        self.verify_user(user) # Verify created user
+        author = self.create_a_user("author", "info@author.co", "Test123.")
+        rater = self.create_a_user("test", "info@test.co", "Test123.") # create user
+        self.verify_user(author) # Verify created author
+        self.verify_user(rater) # Verify created rater
         # Login test user and return authorization token.
-        auth_user = self.login_user() 
-        user = User.objects.get()
+        auth_author = self.login_user(self.author) 
+        auth_user = self.login_user(self.user) 
         article = self.create_article() # create article
         res = self.client.post('/api/articles/'+article.slug+'/rate/',
                                     self.rate_empty,
@@ -200,11 +217,13 @@ class RateTestCase(APITestCase):
     def test_cannot_rate_non_existent_article(self):
         """ Should not rate non existing article."""
 
-        user = self.create_a_user() # create user
-        self.verify_user(user) # Verify created user
+        author = self.create_a_user("author", "info@author.co", "Test123.")
+        rater = self.create_a_user("test", "info@test.co", "Test123.") # create user
+        self.verify_user(author) # Verify created author
+        self.verify_user(rater) # Verify created rater
         # Login test user and return authorization token.
-        auth_user = self.login_user() 
-        user = User.objects.get()
+        auth_author = self.login_user(self.author) 
+        auth_user = self.login_user(self.user) 
         article = self.create_article() # create article
         res = self.client.post('/api/articles/random/rate/',
                                     self.rate,
@@ -216,4 +235,29 @@ class RateTestCase(APITestCase):
         errors = json.loads(res.content).get('rate')
         error = errors['errors']['message'][0]
         self.assertEquals(error, "Article doesnt exist.")
+
         self.assertEquals(res.status_code, 404)
+
+    def test_cannot_rate_your_article(self):
+        """ Should not rate his/her article."""
+
+        author = self.create_a_user("author", "info@author.co", "Test123.")
+        rater = self.create_a_user("test", "info@test.co", "Test123.") # create user
+        self.verify_user(author) # Verify created author
+        self.verify_user(rater) # Verify created rater
+        # Login test user and return authorization token.
+        auth_author = self.login_user(self.author) 
+        auth_user = self.login_user(self.user) 
+        article = self.create_article() # create article
+        res = self.client.post('/api/articles/'+article.slug+'/rate/',
+                                    self.rate,
+                                    HTTP_AUTHORIZATION='Bearer ' +
+                                    auth_author["user"]["token"],
+                                    format='json'
+                                    )
+        res.render()
+        errors = json.loads(res.content).get('rate')
+        error = errors['errors']['message'][0]
+        self.assertEquals(error, "You can not rate your article.")
+
+        self.assertEquals(res.status_code, 403)
