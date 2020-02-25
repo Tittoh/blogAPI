@@ -17,6 +17,9 @@ class RegistrationSerializer(serializers.ModelSerializer):
         min_length=8,
         write_only=True
     )
+    bio = serializers.CharField(source='profile.bio', read_only=True)
+    image = image = serializers.CharField(
+        source='profile.image', read_only=True)
 
     # The client should not be able to send a token along with a registration
     # request. Making `token` read-only handles that for us.
@@ -26,7 +29,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         model = User
         # List all of the fields that could possibly be included in a request
         # or response, including fields specified explicitly above.
-        fields = ['email', 'username', 'password', 'token']
+        fields = ['email', 'username', 'password', 'bio', 'image', 'token']
 
     def create(self, validated_data):
         # Use the `create_user` method we wrote earlier to create a new user.
@@ -37,6 +40,8 @@ class LoginSerializer(serializers.Serializer):
     email = serializers.CharField(max_length=255)
     username = serializers.CharField(max_length=255, read_only=True)
     password = serializers.CharField(max_length=128, write_only=True)
+    bio = serializers.CharField(source='profile.bio', read_only=True)
+    image = image = serializers.CharField(source='profile.image', read_only=True)
     token = serializers.CharField(max_length=128, read_only=True)
 
 
@@ -88,12 +93,8 @@ class LoginSerializer(serializers.Serializer):
         # The `validate` method should return a dictionary of validated data.
         # This is the data that is passed to the `create` and `update` methods
         # that we will see later on.
-        return {
-            'email': user.email,
-            'username': user.username,
-            'token':user.token
+        return user
 
-        }
 
 class EmailSerializer(serializers.Serializer):
     # Ensures that the email is not more than 255 characters long
