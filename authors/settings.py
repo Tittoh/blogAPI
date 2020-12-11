@@ -153,6 +153,7 @@ CORS_ORIGIN_WHITELIST = (
     'https://localhost:4000',
     'http://localhost:3000',
     'https://tittohtech-blog-central.herokuapp.com',
+    'https://blog-central.netlify.app/'
     'https://10.10.156.84:9000'
 )
 
